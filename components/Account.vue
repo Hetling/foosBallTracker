@@ -24,6 +24,12 @@
                 Sign Out
             </button>
         </div>
+        
+        <div>
+            <NuxtLink to="/" class="button block secondary">
+                Back to Rankings
+            </NuxtLink>
+        </div>
     </form>
 </template>
 
@@ -78,8 +84,8 @@ async function signOut() {
         loading.value = true
         let { error } = await supabase.auth.signOut()
         if (error) throw error
-        // You might want to navigate to login page after sign out
-        await navigateTo('/login')
+        // Navigate to home page after sign out
+        await navigateTo('/')
     } catch (error) {
         alert(error.message)
     } finally {
@@ -87,3 +93,16 @@ async function signOut() {
     }
 }
 </script>
+
+<style scoped>
+.button.secondary {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    margin-top: 10px;
+}
+
+.button.secondary:hover {
+    background-color: #e5e5e5;
+}
+</style>

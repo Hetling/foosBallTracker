@@ -10,6 +10,11 @@
                 <input type="submit" class="button block" :value="loading ? 'Loading' : 'Send magic link'"
                     :disabled="loading" />
             </div>
+            <div>
+                <NuxtLink to="/" class="button block secondary" style="margin-top: 10px; text-align: center;">
+                    Back to Rankings
+                </NuxtLink>
+            </div>
         </div>
     </form>
 </template>
@@ -32,3 +37,18 @@ const handleLogin = async () => {
     }
 }
 </script>
+
+<style scoped>
+.button.secondary {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    display: block;
+    text-decoration: none;
+    padding: 10px;
+}
+
+.button.secondary:hover {
+    background-color: #e5e5e5;
+}
+</style>
