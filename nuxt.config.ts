@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   url: process.env.SUPABASE_URL,
   key: process.env.SUPABASE_KEY,
   },
+  css: ['@/assets/main.css'],
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true }
 })

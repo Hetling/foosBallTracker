@@ -1,8 +1,13 @@
 <template>
 	<div>
 		<header class="header">
-			<h1>Tournament Rankings</h1>
-			<NuxtLink to="/account" class="account-button">Account</NuxtLink>
+			<div class="header-content">
+				<div class="header-left">
+					<h1>FoosBall Rankings</h1>
+					<button v-if="showBackButton" @click="goBack" class="back-button">← Back</button>
+				</div>
+				<NuxtLink v-if="user" to="/account" class="account-button">Account</NuxtLink>
+			</div>
 		</header>
 		<div class="container" style="padding: 50px 0 100px 0">
 			<NuxtPage />
@@ -11,30 +16,62 @@
 </template>
 
 <script setup>
+const router = useRouter();
+const route = useRoute();
+const user = useSupabaseUser()
+
+const showBackButton = computed(() => {
+  // Don't show back button on the root page
+  return route.path !== '/';
+});
+
+const goBack = () => {
+  router.go(-1); // Go back one page in history
+};
+
 useHead({
-	title: 'Tournament Rankings'
+	title: 'FoosBall Rankings'
 })
 </script>
 
 <style>
 .header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1rem 2rem;
-	background-color: #f5f5f5;
-	border-bottom: 1px solid #e0e0e0;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+}
+
+.header-content {
+  display: flex;
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.header-left {
+  text-align: left;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 5px 10px;
+  margin-top: 5px;
+}
+
+.back-button:hover {
+  text-decoration: underline;
 }
 
 .account-button {
-	padding: 0.5rem 1rem;
-	background-color: #4CAF50;
-	color: white;
-	text-decoration: none;
-	border-radius: 4px;
+  position: absolute;
+  right: 10px;
+  color: inherit;
 }
 
 .account-button:hover {
-	background-color: #45a049;
+  text-decoration: underline;
 }
 </style>

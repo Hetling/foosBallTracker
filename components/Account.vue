@@ -10,11 +10,6 @@
             <input id="username" type="text" v-model="username" />
         </div>
         <div>
-            <label for="website">Website</label>
-            <input id="website" type="url" v-model="website" />
-        </div>
-
-        <div>
             <input type="submit" class="button block primary" :value="loading ? 'Loading ...' : 'Update'"
                 :disabled="loading" />
         </div>
@@ -39,14 +34,13 @@ const user = useSupabaseUser()
 
 const loading = ref(false)
 const username = ref('')
-const website = ref('')
 const avatar_path = ref('')
 
 const { data: profile } = await useAsyncData('profile', async () => {
     loading.value = true
     const { data } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url`)
+        .select(`username, avatar_url`)
         .eq('id', user.value.id)
         .single()
 
@@ -56,7 +50,6 @@ const { data: profile } = await useAsyncData('profile', async () => {
 
 if (profile.value) {
     username.value = profile.value.username || ''
-    website.value = profile.value.website || ''
     avatar_path.value = profile.value.avatar_url || ''
 }
 
@@ -66,7 +59,6 @@ async function updateProfile() {
         const updates = {
             id: user.value.id,
             username: username.value,
-            website: website.value,
             avatar_url: avatar_path.value,
             updated_at: new Date(),
         }
