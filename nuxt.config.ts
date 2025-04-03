@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   supabase: {
   url: process.env.SUPABASE_URL,
   key: process.env.SUPABASE_KEY,
+  redirectOptions: { login: '/login', callback: '/confirm', exclude: ['/emailotp*'], }
   },
   css: ['@/assets/main.css'],
   compatibilityDate: '2024-11-01',
