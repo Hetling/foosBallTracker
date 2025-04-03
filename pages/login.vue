@@ -1,15 +1,31 @@
 <template>
-    <form class="row flex flex-center" @submit.prevent="handleLogin">
+    <form class="row flex flex-center">
         <div class="col-6 form-widget">
             <h1 class="header">Join the Leaderboard</h1>
-            <p class="description">Use your novo email below, to receive a signin link</p>
-            <div>
+            <p class="description" v-if="!showLoginButton">
+                Use your novo email below, to receive a signin link
+            </p>
+            <p class="description" v-else>
+                Click the button below to complete your login
+            </p>
+            
+            <div v-if="!showLoginButton">
                 <input class="inputField" type="email" placeholder="Your email" v-model="email" />
             </div>
-            <div>
-                <input type="submit" class="button block" :value="loading ? 'Loading' : 'Send magic link'"
-                    :disabled="loading" />
+            
+            <div v-if="!showLoginButton">
+                <input type="submit" class="button block" 
+                       :value="loading ? 'Loading' : 'Send magic link'"
+                       @click.prevent="handleLogin"
+                       :disabled="loading" />
             </div>
+            
+            <div v-if="showLoginButton">
+                <button class="button block" @click.prevent="handleTokenLogin" :disabled="loading">
+                    {{ loading ? 'Logging in...' : 'Complete Login' }}
+                </button>
+            </div>
+            
             <div>
                 <NuxtLink to="/" class="button block secondary" style="margin-top: 10px; text-align: center;">
                     Back to Rankings
@@ -24,6 +40,23 @@ const supabase = useSupabaseClient()
 
 const loading = ref(false)
 const email = ref("")
+const token = ref("")
+const showLoginButton = ref(false)
+
+// Check URL parameters on component mount
+onMounted(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get('token')
+    const urlEmail = urlParams.get('email')
+    console.log("URL Token:", urlToken)
+    console.log("URL Email:", urlEmail) 
+    if (urlToken && urlEmail) {
+        token.value = urlToken
+        email.value = urlEmail
+        showLoginButton.value = true
+    }
+})
+
 const handleLogin = async () => {
     try {
         loading.value = true
@@ -32,6 +65,27 @@ const handleLogin = async () => {
         alert("Check your email for the login link!")
     } catch (error) {
         alert(error.message)
+    } finally {
+        loading.value = false
+    }
+}
+
+const handleTokenLogin = async () => {
+    try {
+        loading.value = true
+        const { error } = await supabase.auth.verifyOtp({
+            email: email.value,
+            token: token.value,
+            type: 'magiclink'
+        })
+        
+        if (error) throw error
+        
+        // Redirect after successful login
+        navigateTo('/')
+    } catch (error) {
+        alert(error.message)
+        showLoginButton.value = false
     } finally {
         loading.value = false
     }

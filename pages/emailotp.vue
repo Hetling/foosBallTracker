@@ -21,14 +21,16 @@ const handleSignin = async () => {
     
     // Extract confirmation URL from the current URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const confirmationURL = urlParams.get('confirmation_url');
-    const siteURL = "foos-ball-tracker.vercel.app"; // Replace with actual site URL
+    const token = urlParams.get('token');
+    const email = urlParams.get('email');
     
-    if (confirmationURL) {
-        window.location.href = confirmationURL;
+    const { error } = await useSupabaseClient().auth.signInWithOtp({ token, email }
+
+    );
+    if (error) {
+        errorMessage.value = error.message; // Set the error message
+        alert(error.message);
     } else {
-        errorMessage.value = "No confirmation URL found in parameters";
-        console.error(errorMessage.value);
     }
     loading.value = false;
 };
