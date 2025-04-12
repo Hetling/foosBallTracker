@@ -2,11 +2,6 @@
 	<div class="container">
 		<div class="main-content">
 			<h2>Tournament Rankings</h2>
-			<div class="actions">
-				<NuxtLink to="/add-match" class="add-match-button">
-					Add New Match
-				</NuxtLink>
-			</div>
 			
 			<div v-if="loading" class="loading">Loading rankings...</div>
 			<div v-else>

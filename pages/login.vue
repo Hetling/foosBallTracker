@@ -3,12 +3,12 @@
       <div class="col-6 form-widget">
         <h1 class="header">Join the Leaderboard</h1>
         <p class="description" v-if="!showLoginButton">
-          Use your novo email below, to receive a signin link
+          Use your email below, to receive a signin link
         </p>
         <p class="description" v-else>
           Click the button below to complete your login
         </p>
-        
+      
         <div v-if="!showLoginButton">
           <input class="inputField" type="email" placeholder="Your email" v-model="email" />
         </div>
@@ -24,12 +24,6 @@
           <button class="button block" @click.prevent="handleTokenLogin" :disabled="loading">
             {{ loading ? 'Logging in...' : 'Complete Login' }}
           </button>
-        </div>
-        
-        <div>
-          <NuxtLink to="/" class="button block secondary" style="margin-top: 10px; text-align: center;">
-            Back to Rankings
-          </NuxtLink>
         </div>
       </div>
     </form>
