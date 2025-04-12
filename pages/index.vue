@@ -9,6 +9,15 @@
 					<h3>Your Current Ranking</h3>
 					<div class="rank-card highlight">
 						<div class="rank">#{{ currentUserRank.rank }}</div>
+						<img 
+							v-if="currentUserRank.avatarUrl" 
+							:src="currentUserRank.avatarUrl" 
+							alt="User avatar" 
+							class="avatar"
+						>
+						<div v-else class="avatar-placeholder">
+							{{ currentUserRank.username.charAt(0).toUpperCase() }}
+						</div>
 						<div class="player-info">
 							<div class="name">{{ currentUserRank.username }}</div>
 							<div class="score">{{ currentUserRank.elo }} ELO</div>
@@ -20,6 +29,15 @@
 				<div class="rankings-list">
 					<div v-for="player in rankings" :key="player.id" class="rank-card">
 						<div class="rank">#{{ player.rank }}</div>
+						<img 
+							v-if="player.avatarUrl" 
+							:src="player.avatarUrl" 
+							alt="User avatar" 
+							class="avatar"
+						>
+						<div v-else class="avatar-placeholder">
+							{{ player.username.charAt(0).toUpperCase() }}
+						</div>
 						<div class="player-info">
 							<div class="name">{{ player.username }}</div>
 							<div class="score">{{ player.elo }} ELO</div>
@@ -44,25 +62,48 @@ const loading = ref(true)
 const rankings = ref([])
 const currentUserRank = ref(null)
 
+const downloadImage = async (path) => {
+  try {
+    const { data, error } = await supabase.storage.from('avatars').download(path)
+    if (error) throw error
+    return URL.createObjectURL(data)
+  } catch (error) {
+    console.error('Error downloading image: ', error.message)
+    return null
+  }
+}
+
 // Fetch rankings data
 const fetchRankings = async () => {
   try {
     loading.value = true
     
-    // Fetch all profiles ordered by ELO (descending)
+    // Fetch all profiles ordered by ELO (descending) including avatar_url
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, username, elo')
+      .select('id, username, elo, avatar_url')
       .order('elo', { ascending: false })
     
     if (error) throw error
     
-    // Add rank to each player
+    // Process player data with avatars
     if (data) {
-      rankings.value = data.map((player, index) => ({
-        ...player,
-        rank: index + 1
-      }))
+      const processedPlayers = []
+      
+      for (const player of data) {
+        let avatarUrl = null
+        if (player.avatar_url) {
+          avatarUrl = await downloadImage(player.avatar_url)
+        }
+        
+        processedPlayers.push({
+          ...player,
+          avatarUrl,
+          rank: processedPlayers.length + 1
+        })
+      }
+      
+      rankings.value = processedPlayers
       
       // Find current user's rank if logged in
       if (user.value) {
@@ -89,7 +130,6 @@ watch(user, () => {
 </script>
 
 <style scoped>
-/* Your existing styles remain the same */
 .container {
 	display: flex;
 	gap: 2rem;
@@ -153,6 +193,7 @@ watch(user, () => {
 	border-radius: 4px;
 	background-color: #1e1e1e;
 	box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+	gap: 1rem;
 }
 
 .rank-card.highlight {
@@ -165,6 +206,24 @@ watch(user, () => {
 	font-weight: bold;
 	width: 50px;
 	color: #1890ff;
+}
+
+.avatar {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.avatar-placeholder {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background-color: #1890ff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
 }
 
 .player-info {
